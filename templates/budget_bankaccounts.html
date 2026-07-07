@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Budget Accounts
+{% endblock %}
+
+{% block main %}
+    <h1>Budget Bank Accounts</h1>
+
+    <h2>Add your Bank Accounts</h2>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Account Names</th>
+                    <th style="width: 200px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2" class="table-secondary text-center fw-bold">Bank Accounts</td>
+                </tr>
+
+                {% for bank_account in bank_accounts %}
+                <tr>
+                    <td class="display-cell">{{ bank_account.account_name }}</td>
+                    <td class="edit-cell" style="display:none;">
+                        <input type="text"
+                               name="new_name"
+                               class="form-control form-control-sm"
+                               value="{{ bank_account.account_name }}">
+                    </td>
+                    <td>
+                        <span class="display-actions">
+                            <button type="button"
+                                    class="btn btn-secondary btn-sm"
+                                    onclick="enableEdit(this.closest('tr'))">
+                                Edit
+                            </button>
+                            <form action="/budget_bankaccounts" method="POST"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Delete this bank account?');">
+                                  <input type="hidden" name="action" value="deletebankaccount">
+                                  <input type="hidden" name="bank_account_id" value="{{ bank_account.id }}">
+                                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </span>
+                        <span class="edit-actions" style="display:none;">
+                            <button type="button"
+                                    class="btn btn-success btn-sm"
+                                    onclick="saveEdit(this.closest('tr'), '/budget_bankaccounts')">
+                                Save
+                            </button>
+                            <button type="button"
+                                    class="btn btn-secondary btn-sm"
+                                    onclick="cancelEdit(this.closest('tr'))">
+                                Cancel
+                            </button>
+                        </span>
+                    </td>
+                    <td class="edit-cell edit-hidden" style="display:none;">
+                        <input type="hidden" name="action"          value="editbankaccount">
+                        <input type="hidden" name="bank_account_id" value="{{ bank_account.id }}">
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="3">
+                        <form action="/budget_bankaccounts" method="POST">
+                            <div class="d-flex gap-2 align-items-center">
+                                <input type="hidden" name="action" value="addbankaccount">
+                                <input type="text" name="new_bank_card" class="form-control"
+                                       placeholder="New Bank Account">
+                                <button type="submit" class="btn btn-primary">Add Bank Account</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+{% endblock %}
