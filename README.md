@@ -19,16 +19,31 @@ The project grew out of a simple desire to track day-to-day spending without rel
 - **Transaction tracking** — the heart of the app. Users can add a transaction, edit it in place, delete it, or filter the transaction history by any combination of date, type, category, sub-category, amount, details, or account.
 - **Running balances** — every transaction stores its own balance-after-transaction. Whenever a transaction is inserted, edited, or deleted, `recalculate_balances()` walks forward from the earliest affected date and recomputes every balance after it, so editing a transaction from three weeks ago correctly ripples forward through everything since.
 
+**Setup**
+
+```bash
+pip install -r requirements.txt
+python seed_demo_data.py
+flask run
+```
+
+This seeds a fresh `finances.db` with fictional demo data — no real user data is stored in this repo, and `finances.db` is gitignored. Log in with:
+
+username: demo
+password: demo1234
+
+
 **File structure and what each file does**
 
 - `app.py` — creates the Flask app, registers each feature's Blueprint, configures filesystem-based sessions (so login state survives server restarts, unlike signed cookies), and disables response caching so a logged-out user can't hit the back button and see stale authenticated pages. It also defines the `/` route, which looks up the logged-in user's name for the dashboard.
-- `helpers.py` — shared utilities used across every route. This includes `get_db()` (opens a fresh per-request SQLite connection with foreign keys enabled, which avoids the "SQLite objects created in a thread" error that comes from reusing a single global connection), `login_required` (a decorator function that redirects anonymous visitors to `/login`), `apology()` (renders a memegen-powered error page), and a small set of generic query builders — `db_insert`, `db_update`, and `db_delete` — that build parameterized SQL from a dictionary of column/value pairs, so every route doesn't need to hand-write its own `INSERT`/`UPDATE`/`DELETE` statements. `recalculate_balances()` is the most lenghtly function here: it accepts an optional `start_date` so it only has to recompute balances from the point of change forward, instead of replaying a user's entire transaction history on every edit.
+- `helpers.py` — shared utilities used across every route. This includes `get_db()` (opens a fresh per-request SQLite connection with foreign keys enabled, which avoids the "SQLite objects created in a thread" error that comes from reusing a single global connection), `login_required` (a decorator function that redirects anonymous visitors to `/login`), `apology()` (renders a memegen-powered error page), and a small set of generic query builders — `db_insert`, `db_update`, and `db_delete` — that build parameterized SQL from a dictionary of column/value pairs, so every route doesn't need to hand-write its own `INSERT`/`UPDATE`/`DELETE` statements. `recalculate_balances()` is the most lengthy function here: it accepts an optional `start_date` so it only has to recompute balances from the point of change forward, instead of replaying a user's entire transaction history on every edit.
 - `routes/auth.py` — registration, login, and logout. Passwords are never stored in plaintext; only their hash is persisted, and the login route checks the hash against the submitted password with `check_password_hash`.
 - `routes/budget_tracking.py` — It handles adding, editing, deleting, and filtering transactions. Add and edit share a single `_parse_transaction_form()` helper so the same validation rules (required fields, positive amount, valid category-for-type, valid account ownership) can't silently drift apart between the two code paths. Category and account names are resolved to their database IDs server-side rather than trusted from the form, so a user can't submit a category or account that isn't actually theirs.
 - `routes/budget_categories.py` and `routes/budget_bankaccounts.py` — near-identical CRUD routes for the two setup pages, each preventing duplicate names and validating input before writing to the database.
 - `routes/budget_planning.py` — a Blueprint referenced in `app.py` for a planning/budgeting view planned alongside tracking.
 - `templates/` — Jinja templates extending a shared `layout.html`, which provides the Bootstrap navbar (with links conditional on login state) and a consistent uniform page setup. `budget_tracking.html` includes the inline "edit in place" UI, with the category dropdown data passed from Python to JavaScript via Jinja's `tojson` filter so the same category list doesn't need a second AJAX round-trip.
-- `finances.db` — the SQLite database, with `users`, `bank_accounts`, `categories`, and `transactions` tables, tied together with foreign keys (e.g. deleting a bank account cascades to its transactions).
+- `finances.db` — the SQLite database (gitignored, not committed). Generated locally by running `seed_demo_data.py`, with `users`, `bank_accounts`, `categories`, `transactions`, and `budget` tables, tied together with foreign keys (e.g. deleting a bank account cascades to its transactions).
+- `seed_demo_data.py` — populates a fresh `finances.db` with fictional demo data (a demo user, two accounts, and a set of sample transactions) so the app is runnable out of the box without any real personal data.
 
 **Design decisions worth calling out**
 
