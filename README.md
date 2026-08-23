@@ -1,10 +1,14 @@
 # Budgetelier
 
-#### Video Demo:  <[Budgetelier Video Demo](https://youtu.be/eT9XTjaSbBs)>
+**A GDPR-conscious household finance tracker** — built to let users record income, expenses, and savings across multiple accounts and categories, with automatic recalculation of running balances whenever a transaction is added, edited, or deleted out of order.
 
-#### Description:
+**Status:** Actively maintained. Currently migrating from Flask/SQLite to Django/PostgreSQL, with GDPR-compliant data handling (right-to-erasure, data export) and multi-user household permissions planned next.
 
-Budgetelier is a personal finance web application built with Flask, SQLite, and Bootstrap that allows a user to register an account, log in, record income/expense/savings transactions against their own bank accounts and categories, and automatically keeps a running balance across all of their transactions.
+**Tech stack:** Python, Flask, SQLite, Bootstrap, JavaScript (migrating to Django, PostgreSQL)
+
+**Description**
+
+Budgetelier is a personal finance web application that allows a user to register an account, log in, record income/expense/savings transactions against their own bank accounts and categories, and automatically keeps a running balance across all of their transactions.
 
 The project grew out of a simple desire to track day-to-day spending without relying on a spreadsheet, but with the guardrails a spreadsheet doesn't give you for free: input validation, per-user data isolation, and automatic recalculation of running balances whenever a transaction is added, edited, or deleted out of chronological order.
 
