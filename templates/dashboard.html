@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block main %}
+    {% if username %}
+        You are logged in as {{ username }}. This will be your dashboard.
+    {% else %}
+        Please Log in or Register an account.
+    {% endif %}
+{% endblock %}

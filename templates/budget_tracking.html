@@ -1,0 +1,320 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Budget Tracking
+{% endblock %}
+
+{% block main %}
+    <h1> Budget Tracking </h1>
+
+    <!-- The Form -->
+    <h2>Add a Transaction</h2>
+    <form action="/budget_tracking" method="POST">
+        <input type="hidden" name="action" value="addtransaction">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th class="text-start">Date</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Sub Category</th>
+                    <th>Amount</th>
+                    <th>Details</th>
+                    <th>Account</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="date" name="date" autocomplete="off" class="form-control" placeholder="YYYY-MM-DD" required>
+                    </td>
+                    <td>
+                        <select name="type" id="type-select-add" class="form-control"
+                            onchange="updateCategories('add')" required>
+                            <option disabled selected>Type</option>
+                            <option value=income>Income</option>
+                            <option value=expenses>Expenses</option>
+                            <option value=savings>Savings</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="category" id="category-select-add" class="form-control" disabled required>
+                            <option value="" disabled selected>Select Type First</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="sub_category" class="form-control" placeholder="Optional">
+                    </td>
+                    <td>
+                        <input type="number" name="amount" class="form-control" step="0.01" required>
+                    </td>
+                    <td>
+                        <input type="text" name="details" class="form-control" required>
+                    </td>
+                    <td>
+                        <select name="card_id" class="form-control" required>
+                            <option value="" disabled selected>Selected Account</option>
+                            {% for acc in accounts %}
+                                <option value="{{ acc.account_name }}">{{ acc.account_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+
+    <!-- Filter and Search for Transaction -->
+     <h2> Filter Transactions</h2>
+     <form action="/budget_tracking" method="POST">
+        <input type="hidden" name="action" value="filtertransaction">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th class="text-start">Date</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Sub Category</th>
+                    <th>Amount</th>
+                    <th>Details</th>
+                    <th>Account</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="date" name="date" class="form-control" autocompelte="off" placeholder="YYYY-MM-DD">
+                    </td>
+                    <td>
+                        <select name="type" id="type-select-filter" class="form-control"
+                            onchange="updateCategories('filter')">
+                            <option disabled selected>Type</option>
+                            <option value=income>Income</option>
+                            <option value=expenses>Expenses</option>
+                            <option value=savings>Savings</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="category" id="category-select-filter" class="form-control" disabled>
+                            <option value="" disabled selected>Select Type First</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="sub_category" class="form-control" placeholder="Optional">
+                    </td>
+                    <td>
+                        <input type="number" name="amount" class="form-control" steps="0.01">
+                    </td>
+                    <td>
+                        <input type="text" name="details" class="form-control">
+                    </td>
+                    <td>
+                        <select name="card_id" class="form-control">
+                            <option value="" disabled selected>Selected Account</option>
+                            {% for acc in accounts %}
+                                <option value="{{ acc.account_name }}">{{ acc.account_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-secondary">Filter</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+     </form>
+
+    <!-- Recent transaction Table -->
+    <h2>Recent Transactions</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Sub-Category</th>
+                <th>Amount</th>
+                <th>Details</th>
+                <th>Balance</th>
+                <th>Account</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in transactions %}
+            <tr data-date="{{ t.date }}"
+                data-type="{{ t.transaction_type }}"
+                data-category="{{ t.category_name }}"
+                data-sub="{{ t.sub_category or '' }}"
+                data-amount="{{ t.amount }}"
+                data-details="{{ t.details }}"
+                data-account="{{ t.account_name }}">
+
+                <!-- DATE COLUMN -->
+                <td class="display-cell">{{ t.date }}</td>
+                <td class="edit-cell" style="display:none;">
+                    <input type="date" name="date" class="form-control">
+                </td>
+
+                <!-- TYPE COLUMN -->
+                <td class="display-cell">{{ t.transaction_type | capitalize }}</td>
+                <td class="edit-cell" style="display:none;">
+                    <select name="type" class="form-control"
+                        onchange="updateEditCategory(this)">
+                        <option value="income">Income</option>
+                        <option value="expenses">Expenses</option>
+                        <option value="savings">Savings</option>
+                    </select>
+                </td>
+
+                <!-- CATEGORY COLUMN -->
+                <td class="display-cell">{{ t.category_name }}</td>
+                <td class="edit-cell" style="display:none;">
+                    <select name="category" class="form-control">
+                        <option value="">Select...</option>
+                    </select>
+                </td>
+
+                <!-- SUB-CATEGORY COLUMN -->
+                <td class="display-cell">{{ t.sub_category or '-' }}</td>
+                <td class="edit-cell" style="display:none;">
+                    <input type="text" name="sub_category" class="form-control" placeholder="Optional">
+                </td>
+
+                <!-- AMOUNT COLUMN -->
+                <td class="display-cell">{{ t.amount | eur }}</td>
+                <td class="edit-cell" style="display:none;">
+                    <input type="number" name="amount" class="form-control" step="0.01">
+                </td>
+
+                <!-- DETAILS COLUMN -->
+                <td class="display-cell text-end">{{ t.details }}</td>
+                <td class="edit-cell" style="display:none;">
+                    <input type="text" name="details" class="form-control">
+                </td>
+
+                <!-- BALANCE COLUMN -->
+                <td class="display-cell">{{ t.balance | eur }}</td>
+                <td class="edit-cell" style="display:none;">{{ t.balance | eur }}</td>
+
+                <!-- ACCOUNT COLUMN -->
+                <td class="display-cell">{{ t.account_name }}</td>
+                <td class="edit-cell" style="display:none;">
+                    <select name="card_id" class="form-control">
+                        {% for acc in accounts %}
+                            <option value="{{ acc.account_name }}">{{ acc.account_name }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+
+                <!-- HiIDDEN SERVER DATA - edit-hidden keeps this invisible layers -->
+                 <td class="edit-cell edit-hidden" style="display:none;">
+                    <input type="hidden" name="action" value="edittransaction">
+                    <input type="hidden" name="transaction_id" value="{{ t.id }}">
+                 </td>
+
+                <!-- ACTION BUTTONS -->
+                <td>
+                    <!-- Display Mode Buttons -->
+                    <span class="display-actions">
+                        <button type="button"
+                            class="btn btn-secondary btn-sm"
+                            onclick="enableEditTransaction(this.closest('tr'))">
+                            Edit
+                        </button>
+                        <form action="/budget_tracking" method="POST" style="display:inline;"
+                            onsubmit="return confirm('Delete this transaction?');">
+                            <input type="hidden" name="action" value="deletetransaction">
+                            <input type="hidden" name="transaction_id" value="{{ t.id }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </span>
+
+                    <!-- Edit Mode Buttons (Default Hidden) -->
+                    <span class="edit-actions" style="display:none;">
+                        <button type="button" class="btn btn-success btn-sm"
+                            onclick="saveEdit(this.closest('tr'), '/budget_tracking')">
+                            Save
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm"
+                            onclick="cancelEdit(this.closest('tr'))">
+                            Cancel
+                        </button>
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Javascript to Handle Dynamic Dropdowns -->
+    <script>
+        const categoriesData = JSON.parse('{{ categories | tojson }}');
+
+        // Claude assisted me in figuring out how to update the columns once a transaction type had been selected.
+        function updateCategories(formType) {
+            const suffix = formType === 'add' ? '-add' : '-filter';
+            const typeSelect = document.getElementById('type-select' + suffix);
+            const categorySelect = document.getElementById('category-select' + suffix);
+            const selectedType = typeSelect.value;
+
+            categorySelect.innerHTML = '<option value="" disabled selected>Select Category</option>';
+
+            if (selectedType && categoriesData[selectedType]) {
+                categorySelect.disabled = false;
+                categoriesData[selectedType].forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.text = name;
+                    categorySelect.appendChild(opt);
+                });
+            } else {
+                categorySelect.disabled = true;
+                categorySelect.innerHTML = '<option value="" disabled selected>Select Type First</option>';
+            }
+        }
+
+        function updateEditCategory(typeSelect) {
+            const row = typeSelect.closest('tr');
+            const editCells = Array.from(row.querySelectorAll('.edit-cell:not(.edit-hidden)'));
+            const catSelect = row.querySelector('select[name="category"]');
+            const selectedType = typeSelect.value;
+            catSelect.innerHTML = '<option value="" disabled selected>Select Category</option>';
+
+            if (categoriesData[selectedType]) {
+                categoriesData[selectedType].forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.text = name;
+                    catSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function enableEditTransaction(rowEl) {
+            const d = rowEl.dataset;
+
+            rowEl.querySelector('input[name="date"]').value = d.date;
+            rowEl.querySelector('select[name="type"]').value = d.type;
+            rowEl.querySelector('input[name="sub_category"]').value = d.sub;
+            rowEl.querySelector('input[name="amount"]').value = d.amount;
+            rowEl.querySelector('input[name="details"]').value = d.details;
+            rowEl.querySelector('select[name="card_id"]').value = d.account;
+
+            const typeSelect = rowEl.querySelector('select[name="type"]');
+            updateEditCategory(typeSelect);
+
+            setTimeout(() => {
+                rowEl.querySelector('select[name="category"]').value = d.category;
+            }, 0);
+
+            enableEdit(rowEl);
+        }
+    </script>
+
+{% endblock %}

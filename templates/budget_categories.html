@@ -1,0 +1,228 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Budget Planning
+{% endblock %}
+
+{% block main %}
+    <h1>Budget Categories</h1>
+
+    <h2>Add your Categories</h2>
+
+    <div class="row g-4">
+
+        <!-- INCOME COLUMN -->
+         <div class="col-12 col-md-4">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th colspan="2" class="table-secondary text-center fw-bold">Income</th>
+                </tr>
+                <tr>
+                    <th>Category Name</th>
+                    <th style="width: 200px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in categories['income'] %}
+                        <tr>
+                        <td class="display-cell">{{ item.name }}</td>
+                         <td class="edit-cell" style="display:none;">
+                            <input type="text"
+                                name="new_name"
+                                class="form-control form-control-sm"
+                                value="{{ item.name }}">
+                         </td>
+                         <td>
+                            <span class="display-actions">
+                                <button type="button"
+                                    class="btn btn-secondary btn-sm"
+                                    onclick="enableEdit(this.closest('tr'))">
+                                    Edit
+                                </button>
+                                <form action="/budget_categories" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Delete this income category?');">
+                                    <input type="hidden" name="action" value="deleteincomecategory">
+                                    <input type="hidden" name="category_id" value="{{ item.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </span>
+                            <span class="edit-actions" style="display:none;">
+                                <button type="button"
+                                    class="btn btn-success btn-sm"
+                                    onclick="saveEdit(this.closest('tr'), '/budget_categories')">
+                                    Save
+                                </button>
+                                <button type="button"
+                                    class="btn btn-secondary btn-sm"
+                                    onclick="cancelEdit(this.closest('tr'))">
+                                    Cancel
+                                </button>
+                            </span>
+                         </td>
+                         <td class="edit-cell edit-hidden" style="display:none;">
+                            <input type="hidden" name="action"          value="editincomecategory">
+                            <input type="hidden" name="category_id" value="{{ item.id }}">
+                         </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="3">
+                            <form action="/budget_categories" method="POST">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="hidden" name="action" value="addincomecategory">
+                                    <input type="text" name="new_income_category" class="form-control" placeholder="New Category Name" >
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+         <!-- EXPENSES COLUMN -->
+         <div class="col-12 col-md-4">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th colspan="2" class="table-secondary text-center fw-bold">Expenses</th>
+                </tr>
+                <tr>
+                    <th>Category Name</th>
+                    <th style="width: 200px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in categories['expenses'] %}
+                        <tr>
+                        <td class="display-cell">{{ item.name }}</td>
+                         <td class="edit-cell" style="display:none;">
+                            <input type="text"
+                                name="new_name"
+                                class="form-control form-control-sm"
+                                value="{{ item.name }}">
+                         </td>
+                         <td>
+                            <span class="display-actions">
+                                <button type="button"
+                                    class="btn btn-secondary btn-sm"
+                                    onclick="enableEdit(this.closest('tr'))">
+                                    Edit
+                                </button>
+                                <form action="/budget_categories" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Delete this expenses category?');">
+                                    <input type="hidden" name="action" value="deleteexpensescategory">
+                                    <input type="hidden" name="category_id" value="{{ item.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </span>
+                            <span class="edit-actions" style="display:none;">
+                                <button type="button"
+                                    class="btn btn-success btn-sm"
+                                    onclick="saveEdit(this.closest('tr'), '/budget_categories')">
+                                    Save
+                                </button>
+                                <button type="button"
+                                    class="btn btn-secondary btn-sm"
+                                    onclick="cancelEdit(this.closest('tr'))">
+                                    Cancel
+                                </button>
+                            </span>
+                         </td>
+                         <td class="edit-cell edit-hidden" style="display:none;">
+                            <input type="hidden" name="action"          value="editexpensescategory">
+                            <input type="hidden" name="category_id" value="{{ item.id }}">
+                         </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="3">
+                            <form action="/budget_categories" method="POST">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="hidden" name="action" value="addexpensescategory">
+                                    <input type="text" name="new_expenses_category" class="form-control" placeholder="New Category Name" >
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SAVINGS COLUMN -->
+         <div class="col-12 col-md-4">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th colspan="2" class="table-secondary text-center fw-bold">Savings</th>
+                </tr>
+                <tr>
+                    <th>Category Name</th>
+                    <th style="width: 200px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in categories['savings'] %}
+                        <tr>
+                        <td class="display-cell">{{ item.name }}</td>
+                         <td class="edit-cell" style="display:none;">
+                            <input type="text"
+                                name="new_name"
+                                class="form-control form-control-sm"
+                                value="{{ item.name }}">
+                         </td>
+                         <td>
+                            <span class="display-actions">
+                                <button type="button"
+                                    class="btn btn-secondary btn-sm"
+                                    onclick="enableEdit(this.closest('tr'))">
+                                    Edit
+                                </button>
+                                <form action="/budget_categories" method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Delete this savings category?');">
+                                    <input type="hidden" name="action" value="deletesavingscategory">
+                                    <input type="hidden" name="category_id" value="{{ item.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </span>
+                            <span class="edit-actions" style="display:none;">
+                                <button type="button"
+                                    class="btn btn-success btn-sm"
+                                    onclick="saveEdit(this.closest('tr'), '/budget_categories')">
+                                    Save
+                                </button>
+                                <button type="button"
+                                    class="btn btn-secondary btn-sm"
+                                    onclick="cancelEdit(this.closest('tr'))">
+                                    Cancel
+                                </button>
+                            </span>
+                         </td>
+                         <td class="edit-cell edit-hidden" style="display:none;">
+                            <input type="hidden" name="action"          value="editsavingscategory">
+                            <input type="hidden" name="category_id" value="{{ item.id }}">
+                         </td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="3">
+                            <form action="/budget_categories" method="POST">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <input type="hidden" name="action" value="addsavingscategory">
+                                    <input type="text" name="new_savings_category" class="form-control" placeholder="New Category Name" >
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+{% endblock %}
