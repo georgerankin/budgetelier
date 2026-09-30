@@ -18,3 +18,5 @@ EXPOSE 5000
 
 # Seed the database with schema + demo data, then start gunicorn
 CMD ["./start.sh"]
+
+LABEL org.opencontainers.image.source="https://github.com/georgerankin/budgetelier"

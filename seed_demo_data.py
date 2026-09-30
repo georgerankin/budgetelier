@@ -17,12 +17,13 @@ Demo login:
     password: demo1234
 """
 
+import os
 import sqlite3
 from datetime import date, timedelta
 
 from werkzeug.security import generate_password_hash
 
-DB_PATH = "finances.db"
+DB_PATH = os.environ.get("DB_PATH", "finances.db")
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (

@@ -69,3 +69,31 @@ jobs:
       - name: Clean up
         if: always()
         run: docker rm -f budgetelier-test || true
+  
+  publish-images:
+
+    needs: build-docker
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - uses: actions/checkout@v6
+    
+    - uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: |
+          ghcr.io/georgerankin/budgetelier:1.1
+          ghcr.io/georgerankin/budgetelier:${{ github.sha }}

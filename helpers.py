@@ -53,8 +53,7 @@ def eur(value):
 # Initialise a fresh database connection. Prevents 'SQLite objects created in a thread' errors.
 def get_db():
 
-      # db = sqlite3.connect('finances.db')
-      db = os.environ.get("DB_PATH", "finances.db")
+      db = sqlite3.connect(os.environ.get("DB_PATH", "finances.db"))
       db.row_factory = sqlite3.Row
 
       db.execute("PRAGMA foreign_keys = ON")
@@ -168,7 +167,7 @@ def recalculate_balances(db, user_id, start_date=None):
 
       # If no date is provided, then start from the very first transaction
       if not start_date:
-            #Get the earliest date for this yser
+            #Get the earliest date for this user
             earliest = db.execute(
                   """
                   SELECT MIN(date)

@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: budgetelier
-        image: budgetelier:1.0
+        image: budgetelier:1.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
