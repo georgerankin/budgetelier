@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: budgetelier
+  labels:
+    app: budgetelier
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: budgetelier
+  template:
+    metadata:
+      labels:
+        app: budgetelier
+    spec:
+      containers:
+      - name: budgetelier
+        image: budgetelier:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DB_PATH
+          value: /data/budgetelier.db
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: budgetelier-pvc

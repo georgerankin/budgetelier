@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from flask import redirect, render_template, session
 from functools import wraps
@@ -52,7 +53,8 @@ def eur(value):
 # Initialise a fresh database connection. Prevents 'SQLite objects created in a thread' errors.
 def get_db():
 
-      db = sqlite3.connect('finances.db')
+      # db = sqlite3.connect('finances.db')
+      db = os.environ.get("DB_PATH", "finances.db")
       db.row_factory = sqlite3.Row
 
       db.execute("PRAGMA foreign_keys = ON")

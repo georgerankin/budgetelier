@@ -23,15 +23,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install flake8
-        run: pip install flake8
+      - name: Install ruff
+        run: pip install ruff
 
-      - name: Lint with flake8
+      - name: Lint with ruff
         run: |
           # Fail only on actual errors (syntax errors, undefined names).
           # Style nitpicks are reported but won't fail the build yet.
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          ruff check . --select=E9,F
+      
+      - name: Format check with ruff (non-blocking for now)
+        run:  ruff format --check . || true
 
   build-docker:
     needs: lint
