@@ -5,7 +5,7 @@ metadata:
   labels:
     app: budgetelier
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   strategy:
     type: Recreate
   selector:
@@ -18,21 +18,21 @@ spec:
     spec:
       containers:
       - name: budgetelier
-        image: budgetelier:1.1
-        imagePullPolicy: IfNotPresent
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         ports:
         - containerPort: 5000
         env:
         - name: DB_PATH
           value: /data/budgetelier.db
         volumeMounts:
-        - name: data
-          mountPath: /data
+        - name: "{{ (index .Values.volumes 0).name }}"
+          mountPath: "{{ (index .Values.volumeMounts 0).mountPath }}"
         readinessProbe:
           httpGet:
-            path: /
-            port: 5000
+            path: "{{ .Values.readinessProbe.httpGet.path }}"
+            port: {{ .Values.readinessProbe.httpGet.port }}
       volumes:
-      - name: data
+      - name: "{{ (index .Values.volumes 0).name }}"
         persistentVolumeClaim:
-          claimName: budgetelier-pvc
+          claimName: "{{ (index .Values.volumes 0).persistentVolumeClaim.claimName }}"

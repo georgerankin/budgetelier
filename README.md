@@ -48,3 +48,28 @@ password: demo1234
 **Design decisions worth calling out**
 
 I initially wrote each route's SQL by hand, but this led to a lot of near-duplicate `INSERT`/`UPDATE` statements that were easy to get subtly wrong (mismatched column counts, forgotten commits). Centralizing that into `db_insert`/`db_update`/`db_delete` in `helpers.py` made every route both shorter and safer, since query parameterization and commits are handled in one place instead of many. Similarly, extracting `_resolve_category()` and `_resolve_account()` meant that "does this category/account actually belong to this user?" is checked identically everywhere it matters, rather than being re-implemented (and potentially forgotten) in each route.
+
+**Running with Docker**
+
+```bash
+docker build -t budgetelier:1.2 .
+docker run -p 5000:5000 budgetelier:1.2
+```
+
+The container seeds the demo database on startup (`start.sh`), then serves the app with gunicorn on port 5000.
+
+**Deploying to Kubernetes (Helm)**
+
+The Helm chart in `deploy/helm/budgetelier/` deploys the app with a PersistentVolumeClaim for the SQLite database and an NGINX Ingress at `budgetelier.local`. Tested on Minikube.
+
+```bash
+minikube addons enable ingress
+docker build -t budgetelier:1.2 .
+minikube image load budgetelier:1.2
+helm install budgetelier deploy/helm/budgetelier
+helm test budgetelier
+```
+
+To open it in a browser, add `127.0.0.1 budgetelier.local` to your hosts file, run `minikube tunnel` in a separate terminal, and visit http://budgetelier.local.
+
+The database lives at the path set by the `DB_PATH` environment variable (`/data/budgetelier.db` in the chart), on a volume that survives pod restarts. Seeding is skipped if the demo user already exists, so restarts don't duplicate data. Image tag, replica count, ingress host and probes are configurable in `values.yaml`.
