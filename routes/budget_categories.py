@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, session, flash
+from flask import Blueprint, render_template, request, redirect, flash
 from helpers import (apology, get_db, login_required,
                      validate_required, check_duplicate, db_insert, db_update, db_delete)
 

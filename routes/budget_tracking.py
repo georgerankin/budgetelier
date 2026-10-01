@@ -103,7 +103,7 @@ def _parse_transaction_form(db, form, user_id):
         return None, apology(f"{missing} is required.", 400)
 
     if trans_type not in VALID_TYPES:
-        return None, apology(f"Invalid transaction type.", 400)
+        return None, apology("Invalid transaction type.", 400)
 
     try:
         amount = float(amount_str)

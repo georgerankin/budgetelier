@@ -98,7 +98,7 @@ def _parse_and_validate(db, category_ids):
     for cat_id in category_ids:
         raw_name = request.form.get(f"account_{cat_id}", "").strip()
         if not raw_name:
-            return apology(f"Select an account for every category row.", 400), None, None
+            return apology("Select an account for every category row.", 400), None, None
 
         account_id = resolve_account(db, raw_name, session['user_id'])
         if account_id is None:
